@@ -12,7 +12,7 @@ In this project, we will develop a reliable utility for the purpose of extractin
 ### Analysis + External Technologies + Source Materials
 Recursion will be the most likely technique used here. The main structure to this project will revolve around creating, filtering, and scanning lists. All of this calls for iterative procedures. We aim to avoid object-orientation for simplicity's sake.
 
-Starting with a YouTube search query, we will scan for the most relevant result as a URL. We will derive the appropriate download link from this URL to recieve the FLV file. The FLV file can then be converted to MP3 either through existing API via Racket libraries or with the help of bash and ffmpeg.
+Starting with a YouTube search query, using net/url, we will scan through videos for the most relevant result as a URL. With regular expressions, we will derive the appropriate download link from this URL to recieve the FLV file. The FLV file can then be converted to MP3 either through existing API via Racket libraries or with the help of bash and ffmpeg. The song will then be played while displaying the thumbnail image and song title.
 
 ### Deliverable and Demonstration
 We will have a straightforward Racket program which takes artist name and song title as input (this conforms with video titles) and produces an MP3 file extracted from the most relevant YouTube video for said input.
