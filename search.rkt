@@ -1,5 +1,6 @@
 #lang racket
 (require net/url)
+(require net/uri-codec)
 
 ;; goes through video results and adds them to a list
 (define (search query)
@@ -19,32 +20,45 @@
         (loop (cons
                (list
                 ;; get video ID (url)
-                (cleanRegexp (regexp-match findVideo myport) #px"data-video-ids=\"")
+                (reg-match findVideo myport #px"data-video-ids=\"")
                 ;; get video Title
-                (cleanRegexp (regexp-match getTitle myport) #px"\"  title=\"")
+                (reg-match getTitle myport #px"\"  title=\"")
                 ;; get video Uploader
-                (cleanRegexp (regexp-match getUploader myport) #px"\" >")
+                (reg-match getUploader myport #px"\" >")
                 ;; is video uploaded by Verified user? (#t or #f)
                 (string=?
-                     (cleanRegexp (regexp-match getVerified myport) #px"</a>")
+                     (reg-match getVerified myport #px"</a>")
                      "&");; if this string = '&' the uploader is Verified
                 ) 
                lst) (sub1 n))))
   (loop '() 3))
 
-;sorts through list of results and finds best video, returns list with video info
+;sorts through list of results and finds best video, returns list with video info and sends that list to yt-link to generate a download link
 (define (bestResult lst)
   (define (iter videos first)
     (cond
-      [(null? videos) first] ;final case, return first video result
-      [(cadddr (car videos)) (car videos)] ;if video is verified
-      [(string-contains? (string-downcase (caddr (car videos))) "vevo") (car videos)] ;if it is uploaded by VEVO
+      [(null? videos) (yt-link first)] ;final case, return first video result
+      [(cadddr (car videos)) (yt-link (car videos))] ;if video is verified
+      [(string-contains? (string-downcase (caddr (car videos))) "vevo") (yt-link (car videos))] ;if it is uploaded by VEVO
       [else (iter (cdr videos) first)])) ; recurse
   (iter lst (car lst))) ; save first video result
 
+; derives a several Download links from a youtube video ID -- will need to be parsed a little further
+(define (yt-link video)
+  (define videoURL (string->url (string-append "https://www.youtube.com/watch?v=" (car video))))
+  (define myport (get-pure-port videoURL))
+  (reg-match #px"url_encoded_fmt_stream_map" myport "")
+  (define link
+    (string-split  
+               (string-replace
+                (uri-decode (string-replace (reg-match #px"url=[^\"]*" myport "") "\\u0026" "&")) "&quality=[a-zA-Z0-9]*" "") "url="))
+  link)
+
 ;; clean up the regular expression and convert to string
-(define (cleanRegexp match cleanStr)
-  (bytes->string/locale (regexp-replace cleanStr (car match) "")))
+(define (reg-match match source cleanStr)
+  (if (not (string? source))
+      (bytes->string/locale (regexp-replace cleanStr (car (regexp-match match source)) ""))
+      (regexp-replace cleanStr (car (regexp-match match source)) "")))
 
 ;; reverse a list
 (define (reverse lst)
