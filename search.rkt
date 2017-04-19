@@ -43,15 +43,17 @@
       [else (iter (cdr videos) first)])) ; recurse
   (iter lst (car lst))) ; save first video result
 
-; derives a several Download links from a youtube video ID -- will need to be parsed a little further
+; derives a Download link from a youtube video ID -- will need to be parsed a little further
 (define (yt-link video)
   (define videoURL (string->url (string-append "https://www.youtube.com/watch?v=" (car video))))
   (define myport (get-pure-port videoURL))
   (reg-match #px"url_encoded_fmt_stream_map" myport "")
-  (define link
-    (string-split  
-               (string-replace
-                (uri-decode (string-replace (reg-match #px"url=[^\"]*" myport "") "\\u0026" "&")) "&quality=[a-zA-Z0-9]*" "") "url="))
+  (define link 
+  (car
+  (string-split
+   (string-replace
+    (string-replace 
+     (uri-decode (reg-match #px"url=[^\"]*" myport "")) "\\u0026" ",") "url=" "") ",")))
   link)
 
 ;; clean up the regular expression and convert to string
