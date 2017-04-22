@@ -1,4 +1,5 @@
 #lang racket
+(require racket/provide)
 (require net/url)
 (require net/uri-codec)
 
@@ -68,3 +69,6 @@
     (if (null? a) b
     (iter (cdr a) (cons (car a) b))))
   (iter lst '()))
+
+(provide search)
+(provide yt-link)
