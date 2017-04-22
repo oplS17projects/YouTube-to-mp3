@@ -25,7 +25,7 @@ In the event that no relevant video is found, an error may be produced or we may
 The accuracy of the program's results will serve as a measurement of success. It helps to have heard the song before, as well as knowing the metadata ahead of time.
 
 ## Architecture Diagram
-Coming soon...
+![diagram](/diagram.png?raw=true "diagram")
 
 ## Schedule
 
