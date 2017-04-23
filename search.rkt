@@ -3,12 +3,14 @@
 (require net/url)
 (require net/uri-codec)
 
+(define (port-from-url-string str)
+  (get-pure-port (string->url str)))
+
 ;; goes through video results and adds them to a list
 (define (search query)
   (define fixQuery (string-replace query " " "+"))
   (define searchString (string-append "https://www.youtube.com/results?search_query=" fixQuery))
-  (define searchUrl (string->url searchString))
-  (define myport (get-pure-port searchUrl))
+  (define myport (port-from-url-string searchString))
 
   (define findVideo #px"data-video-ids=\"[a-zA-Z0-9\\-_]*")
   (define getTitle #px"\"  title=\"[a-zA-Z 0-9.,<>:;~|()!@#$%^&*+=\\-\\[\\]_'/]*")
@@ -38,16 +40,16 @@
 (define (bestResult lst)
   (define (iter videos first)
     (cond
-      [(null? videos) (yt-link first)] ;final case, return first video result
-      [(cadddr (car videos)) (yt-link (car videos))] ;if video is verified
-      [(string-contains? (string-downcase (caddr (car videos))) "vevo") (yt-link (car videos))] ;if it is uploaded by VEVO
+      [(null? videos) (yt-link (car first))] ;final case, return first video result
+      [(cadddr (car videos)) (yt-link (caar videos))] ;if video is verified
+      [(string-contains? (string-downcase (caddr (car videos))) "vevo") (yt-link (caar videos))] ;if it is uploaded by VEVO
       [else (iter (cdr videos) first)])) ; recurse
   (iter lst (car lst))) ; save first video result
 
 ; derives a Download link from a youtube video ID -- will need to be parsed a little further
 (define (yt-link video)
-  (define videoURL (string->url (string-append "https://www.youtube.com/watch?v=" (car video))))
-  (define myport (get-pure-port videoURL))
+  (define videoURL (string-append "https://www.youtube.com/watch?v=" video))
+  (define myport (port-from-url-string videoURL))
   (reg-match #px"url_encoded_fmt_stream_map" myport "")
   (define link 
   (car
@@ -55,7 +57,7 @@
    (string-replace
     (string-replace 
      (uri-decode (reg-match #px"url=[^\"]*" myport "")) "\\u0026" ",") "url=" "") ",")))
-  link)
+  (cons link videoURL))
 
 ;; clean up the regular expression and convert to string
 (define (reg-match match source cleanStr)
@@ -72,3 +74,4 @@
 
 (provide search)
 (provide yt-link)
+(provide port-from-url-string)
