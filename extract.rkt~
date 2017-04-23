@@ -1,6 +1,5 @@
 #lang racket
 (require "pull.rkt")
-(require "search.rkt")
 (require rash)
 
 (define (extract-from-search query)

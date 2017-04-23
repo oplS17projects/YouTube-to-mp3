@@ -30,4 +30,5 @@
 (provide format-from-url)
 (provide download-from-search)
 (provide download-from-id)
+(provide download)
 (provide file-from-url)
