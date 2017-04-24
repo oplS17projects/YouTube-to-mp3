@@ -123,7 +123,7 @@
   ; run script.js using rash and return the output (deciphered signature)
   (string-trim (rash/out "node ./script.js")))
 
-
+(define ~ string-append)
 
 (provide search)
 (provide yt-link)
