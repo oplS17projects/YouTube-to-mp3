@@ -2,6 +2,7 @@
 (require racket/provide)
 (require net/url)
 (require net/uri-codec)
+(require rash)
 
 (define (port-from-url-string str)
   (get-pure-port (string->url str)))
@@ -83,6 +84,46 @@
     (if (null? a) b
     (iter (cdr a) (cons (car a) b))))
   (iter lst '()))
+  
+  
+  
+  ; procedure to decipher a youtube video signature using the html5 player's associated javascript functions
+; still has some issues.
+(define (get-signature script sig)
+  (define url (string->url (~ "https://www.youtube.com" script)))
+  (define port (get-pure-port url))
+  (define sig-func 
+    (cadr
+     (string-split
+      (reg-match #px"signature\",[^;]*" port "") ",")))
+  
+  (define sig-name (car (string-split sig-func "(")))
+  (define param-name (car (string-split (cadr (string-split sig-func "(")) ")")))
+  (define refresh (get-pure-port url))
+  (define sig-def ; function used to cipher signature
+    (~ (reg-match (~ sig-name "=function\\([a-zA-Z]*\\){[^}]*") refresh "") "};"))
+  (define sig-obj ; object used in signature cipher
+    (car (string-split (reg-match ";[a-zA-Z0-9]*\\." sig-def ";") ".")))
+  sig-def
+  
+  (define sub-functions
+    (map (lambda (x) (car (string-split (cadr (string-split x ".")) "("))) (cdr (string-split sig-def ";"))))
+
+  (define objp (get-pure-port url)) ; objp used to get the object definition
+  (define obj-function
+    (~ "var " (reg-match (~ sig-obj "={.+?(?=}};)") objp "") "}};"))
+
+  ; created a javascript file called "script.js"
+  (call-with-output-file "./script.js"
+    (lambda (out)
+      (display
+       (~ obj-function "\n\n" sig-def "\n\nconsole.log(" sig-name "(\"" sig "\"));")
+       out))
+    #:exists 'replace)
+  ; run script.js using rash and return the output (deciphered signature)
+  (string-trim (rash/out "node ./script.js")))
+
+
 
 (provide search)
 (provide yt-link)
