@@ -6,7 +6,7 @@
 
 (define (title-from-url url)
   (define port (port-from-url-string url))
-  (string-replace (bytes->string/locale (cadr (regexp-match #px"\"title\":\"(.*?\",)" port))) #px"( |\\|\"|-|,|\")*?" ""))
+  (string-replace (bytes->string/locale (cadr (regexp-match #px"\"title\":\"(.*?\",)" port))) #px"( |\\|\"|-|/|,|\")*?" ""))
 
 (define (format-from-url url)
   (string-replace (cadr (regexp-match #px"video%2F(.*?&)" url)) "&" ""))
