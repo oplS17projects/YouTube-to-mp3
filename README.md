@@ -27,6 +27,29 @@ The accuracy of the program's results will serve as a measurement of success. It
 ## Architecture Diagram
 ![layout](/layout.png?raw=true "layout")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Schedule
 
 ### First Milestone (Sun Apr 9)
