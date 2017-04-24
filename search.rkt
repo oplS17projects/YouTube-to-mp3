@@ -52,12 +52,24 @@
   (define myport (port-from-url-string videoURL))
   (reg-match #px"url_encoded_fmt_stream_map" myport "")
   (define link 
-  (car
-  (string-split
-   (string-replace
-    (string-replace 
-     (uri-decode (reg-match #px"url=[^\"]*" myport "")) "\\u0026" ",") "url=" "") ",")))
-  (cons link videoURL))
+    (car
+     (string-split
+      (string-replace
+       (string-replace 
+        (uri-decode (reg-match #px"url=[^\"]*" myport "")) "\\u0026" ",") "url=" "") ",")))
+  
+  (if (string-contains? link "signature=")
+    (cons link videoURL)
+    (cons (backup-dl video) videoURL)))
+
+; procedure created as a back-up to generate copyright protected links
+(define (backup-dl id)
+  (define url (string->url (string-append "http://keepvid.com/?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D" id)))
+  (define myport (get-pure-port url))
+  (reg-match "Download music & playlists from 10,000+" myport "")
+  (reg-match "youtube.com " myport "")
+  
+  (car (string-split (reg-match "https:[^\"]*" myport "") "&title=" )))
 
 ;; clean up the regular expression and convert to string
 (define (reg-match match source cleanStr)
