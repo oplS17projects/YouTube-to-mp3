@@ -1,6 +1,6 @@
 # YouTube MP3 Audio Extractor
 
-### Version: 0.4
+### Version: 0.5
 
 ### Statement
 Let's be honest, spending our hard-earned money on music is for chumps. Those of us who are savvy on current trends know that music, in economic terms, has reached zero-scarcity status as a resource. You'll often hear musicians lamenting how difficult it is to profit from record sales.
