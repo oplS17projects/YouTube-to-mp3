@@ -76,7 +76,9 @@
     (cons link videoURL)
     (cons (backup-dl video) videoURL)))
 
-; procedure created as a back-up to generate copyright protected links
+; procedure created as a back-up to generate copyright protected links. some videos have an additional layer of security
+; to prevent the content from being downloaded. A javascript function ciphers the signature needed for a download url
+; 'get-signature' was meant to handle this, but didn't end up working.
 (define (backup-dl id)
   (define url (string->url (string-append "http://keepvid.com/?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D" id)))
   (define myport (get-pure-port url))
@@ -101,7 +103,7 @@
   
   
   ; procedure to decipher a youtube video signature using the html5 player's associated javascript functions
-; still has some issues.
+; still has some issues. -- unfortunately never fully worked. Would still recieve "Access Denied" message after decipher, backup-dl must be used instead
 (define (get-signature script sig)
   (define url (string->url (~ "https://www.youtube.com" script)))
   (define port (get-pure-port url))
