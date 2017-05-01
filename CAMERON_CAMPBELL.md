@@ -56,7 +56,7 @@ The ``` search ``` procedure is used to run a search query and collect three vid
  
 ## 2. Functional Data Processing
 
-All of my work involves cascading procedures. Starting from ``` search ``` a list videos (videos are treated as lists here) is past to the ``` bestResult ``` procedure:
+All of my work involves cascading procedures. Starting from ``` search ``` , a list videos (videos are treated as lists here) is passed to the ``` bestResult ``` procedure:
 
 ```
 (if (= n 0) (bestResult (reverse lst))
@@ -66,7 +66,7 @@ The list of video lists is then processed, and one video is chosen as the 'best 
 ```
 (yt-link (access-video-list first 'id))
 ```
-Finally the url is derived from the selected YouTube video page using regular expressions. 
+Finally the url is derived from the selected YouTube video page using regular expressions and is ready to be used by the downloader procedure. 
  
  
 ## 3. Procedural Abstraction
