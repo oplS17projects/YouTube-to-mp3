@@ -1,10 +1,10 @@
-# Interface to Google Drive in Racket
+# Youtube MP3 Audio Extractor
 
 ## Cam Campbell
 ### April 30, 2017
 
 # Overview
-This following codes allows for a user search query for a YouTube video. A list of related videos are collected through regular expression, along with important information such as the video title, uploader name, video ID, and whether or not the uploader is a verified channel.
+This following code allows for a user search query for a YouTube video. A list of related videos are collected through regular expression, along with important information such as the video title, uploader name, video ID, and whether or not the uploader is a verified channel.
 
 After 3 videos are collected, a best result is determined based on whether the uploader is verified, or if the vidoe is the first result.
 
@@ -14,7 +14,7 @@ Finally a download link is generated through regular expression with information
 **Authorship note:** All of the code described here was written by myself.
 
 # Libraries Used
-The code uses four libraries:
+The code uses two libraries:
 
 ```
 (require net/url)
@@ -26,8 +26,6 @@ The code uses four libraries:
 
 # Key Code Excerpts
 
-Here is a discussion of the most essential procedures, including a description of how they embody ideas from 
-UMass Lowell's COMP.3010 Organization of Programming languages course.
 
 ## 1. Recursively collect videos
 
@@ -53,7 +51,7 @@ The ``` search ``` procedure is used to run a search query and collect three vid
   (loop '() 3))
  ```
  
- This recursive procedure allows regular expression to be reused to find the next video and add it to a list.
+ This recursive procedure allows regular expression to be reused to find the next video and add it to a list. The recursion continues for 3 cycles, then passes off the collected list to the ``` bestResult ``` procedure.
  
  
 ## 2. Functional Data Processing
@@ -73,7 +71,7 @@ Finally the url is derived from the selected YouTube video page using regular ex
  
 ## 3. Procedural Abstraction
 
-After collecting a list of videos, certain parts of the list are checked to determine a best match:
+After collecting a list of videos, certain parts of the list are checked to determine a best match. In order to completely check every video, recursion is also used here, until a match is found, or as a base case, return the first video in the list.
 
 ```
 (define (bestResult lst)
@@ -96,4 +94,4 @@ Using the format I created for checking the video list, my partner @bmourad01 cr
     [(eqv? field 'title) (cadr (car lst))]
     [else #f]))
 ```
-This allows symbols to be used to access the parts of the list previously mentioned.
+This allows symbols to be used to access the parts of the list previously mentioned. Using these symbols makes it much more clear what information is being checked when determining a match.
