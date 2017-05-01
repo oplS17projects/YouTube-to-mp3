@@ -4,14 +4,19 @@
 (require net/uri-codec)
 (require rash)
 
+(define (search-url-string-from-query query)
+  (string-append "https://www.youtube.com/results?search_query="
+                 (string-replace query " " "+")))
+
+(define (video-url-string-from-id id)
+  (string-append "https://www.youtube.com/watch?v=" id))
+
 (define (port-from-url-string str)
   (get-pure-port (string->url str)))
 
 ;; goes through video results and adds them to a list
 (define (search query)
-  (define fixQuery (string-replace query " " "+"))
-  (define searchString (string-append "https://www.youtube.com/results?search_query=" fixQuery))
-  (define myport (port-from-url-string searchString))
+  (define myport (port-from-url-string (search-url-string-from-query query)))
 
   (define findVideo #px"data-video-ids=\"[a-zA-Z0-9\\-_]*")
   (define getTitle #px"\"  title=\"[a-zA-Z 0-9.,<>:;~|()!@#$%^&*+=\\-\\[\\]_'/]*")
@@ -37,19 +42,27 @@
                lst) (sub1 n))))
   (loop '() 3))
 
+(define (access-video-list lst field)
+  (cond
+    [(eqv? field 'verified) (cadddr (car lst))]
+    [(eqv? field 'id) (caar lst)]
+    [(eqv? field 'uploader) (caddr (car lst))]
+    [(eqv? field 'title) (cadr (car lst))]
+    [else #f]))
+
 ;sorts through list of results and finds best video, returns list with video info and sends that list to yt-link to generate a download link
 (define (bestResult lst)
   (define (iter videos first)
     (cond
-      [(null? videos) (yt-link (car first))] ;final case, return first video result
-      [(cadddr (car videos)) (yt-link (caar videos))] ;if video is verified
-      [(string-contains? (string-downcase (caddr (car videos))) "vevo") (yt-link (caar videos))] ;if it is uploaded by VEVO
+      [(null? videos) (yt-link (access-video-list first 'id))] ;final case, return first video result
+      [(access-video-list videos 'verified) (yt-link (access-video-list videos 'id))] ;if video is verified
+      [(string-contains? (string-downcase (access-video-list videos 'uploader)) "vevo") (yt-link (access-video-list videos 'id))] ;if it is uploaded by VEVO
       [else (iter (cdr videos) first)])) ; recurse
-  (iter lst (car lst))) ; save first video result
+  (iter lst lst)) ; save first video result
 
 ; derives a Download link from a youtube video ID -- will need to be parsed a little further
 (define (yt-link video)
-  (define videoURL (string-append "https://www.youtube.com/watch?v=" video))
+  (define videoURL (video-url-string-from-id video))
   (define myport (port-from-url-string videoURL))
   (reg-match #px"url_encoded_fmt_stream_map" myport "")
   (define link 
