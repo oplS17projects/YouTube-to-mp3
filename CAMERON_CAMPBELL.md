@@ -4,7 +4,7 @@
 ### April 30, 2017
 
 # Overview
-This following code allows for a user search query for a YouTube video. A list of related videos are collected through regular expression, along with important information such as the video title, uploader name, video ID, and whether or not the uploader is a verified channel.
+The following code allows for a user search query for a YouTube video. A list of related videos are collected through regular expression, along with important information such as the video title, uploader name, video ID, and whether or not the uploader is a verified channel.
 
 After 3 videos are collected, a best result is determined based on whether the uploader is verified, or if the vidoe is the first result.
 
